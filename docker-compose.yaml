@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  ht-video-api:
+  ht-video-extrator:
     build: 
       context: https://github.com/brunobucci/ht-video-extrator.git#dev
     container_name: ht-video-extrator
