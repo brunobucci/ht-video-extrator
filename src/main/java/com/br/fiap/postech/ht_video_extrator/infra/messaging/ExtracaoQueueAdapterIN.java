@@ -40,10 +40,11 @@ public class ExtracaoQueueAdapterIN implements IExtracaoQueueAdapterIN{
 		
 	}
 	
-	private static VideoDto fromMessageToDto(Map mensagem) {
+	private static VideoDto fromMessageToDto(Map<String, String> mensagem) {
 		return new VideoDto(
-				(String) mensagem.get("codigoEdicao"),
-				(String) mensagem.get("nomeVideo"), 
+				mensagem.get("id"),
+				mensagem.get("codigoEdicao"),
+				mensagem.get("nomeVideo"), 
 				null);
 	}
 }

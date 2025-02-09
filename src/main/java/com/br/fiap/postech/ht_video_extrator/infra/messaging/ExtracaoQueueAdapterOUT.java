@@ -15,14 +15,32 @@ public class ExtracaoQueueAdapterOUT implements IExtracaoQueueAdapterOUT{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Value("${queue2.name}")
+	private String filaVideosExtraidos;
+	
+	@Value("${queue3.name}")
 	private String filaVideosProcessados;
+	
+	@Value("${queue4.name}")
+	private String filaVideosComNotificacao;
 	
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 	
 	@Override
 	public void publishVideoProcessado(String videoJson) {
+		rabbitTemplate.convertAndSend(filaVideosExtraidos, videoJson);
+		logger.info("Publicação na fila videos_extraidos executada.");
+	}
+
+	@Override
+	public void publishVideoComErro(String videoJson) {
 		rabbitTemplate.convertAndSend(filaVideosProcessados, videoJson);
-		logger.info("Publicação na fila VideosProcessados executada.");
+		logger.info("Publicação na fila videos_processados com erro executada.");
+	}
+	
+	@Override
+	public void publishVideoComNotificacao(String videoJson) {
+		rabbitTemplate.convertAndSend(filaVideosComNotificacao, videoJson);
+		logger.info("Publicação na fila videos_com_notificacao com erro executada.");
 	}
 }
