@@ -1,1 +1,17 @@
-/target/
+# Ignore a pasta target (build do Maven)
+target/
+
+# Arquivos de projeto do Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Arquivos de projeto do VS Code
+.vscode/
+
+# Arquivos temporários do macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
