@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.time.LocalTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -56,27 +55,32 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
     
 	public void executar(VideoDto videoDto) {
 
+		boolean trataOk = false;
+		boolean executaOk = false;
 		try {
 			logger.info("Iniciou processo de extração de frames.");
 
-			trataDiretorioDosFrames(caminhoDaPastaDeFrames + videoDto.getCodigoEdicao());
+			trataOk = trataDiretorioDosFrames(caminhoDaPastaDeFrames + videoDto.getCodigoEdicao());
+			executaOk = executaExtracaoDeFrames(videoDto);
 			
-			executaExtracaoDeFrames(videoDto);
+			if(trataOk && executaOk) {
+				extracaoQueueAdapterOUT.publishVideoProcessado(toVideoMessage(videoDto, true));
+				logger.info("Finalizou processo de extração de frames.");
+			}
+			else {
+				apagaDiretorioDosFramesCriados(caminhoDaPastaDeFrames + videoDto.getCodigoEdicao());
+				extracaoQueueAdapterOUT.publishVideoComErro(toVideoMessage(videoDto, false));
+				extracaoQueueAdapterOUT.publishVideoComNotificacao(toVideoMessage(videoDto, false));
+				logger.error("Video publicado na fila processados com erro e fila de notificação.");
+			}
 			
-			// TODO - Zipar pasta ??
-	        
-			extracaoQueueAdapterOUT.publishVideoProcessado(toVideoMessage(videoDto));
-			
-			logger.info("Finalizou processo de extração de frames.");
 		}
 		catch(Exception ex) {
-			//TODO - Publicar na fila de video com erro
-			//extracaoQueueAdapterOUT.publishVideoProcessado(toVideoMessage(videoDto));
-			logger.error("Video publicado na fila videos_com_erro: ", ex);
+			logger.error("Video publicado na fila processados com erro: ", ex);
 		}
 	}
 
-	private void executaExtracaoDeFrames(VideoDto videoDto) {
+	private boolean executaExtracaoDeFrames(VideoDto videoDto) {
 
 		try {
 			String video = videoDto.getNome();
@@ -124,14 +128,16 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
 					process.destroyForcibly();
 				}
 			}
+			return true;
 		} catch (IOException | InterruptedException e) {
 			logger.error("Problema no método trataExtracaoDeFrames.", e);
 			e.printStackTrace();
+			return false;
 		}
 		
 	}
 
-	private void trataDiretorioDosFrames(String diretorioDosFramesDoVideo) {
+	private boolean trataDiretorioDosFrames(String diretorioDosFramesDoVideo) {
 		
 		try {
 			File diretorioDoVideo = new File(diretorioDosFramesDoVideo);
@@ -139,9 +145,24 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
 				FileUtils.forceDelete(diretorioDoVideo);
 			}
 			diretorioDoVideo.mkdir();
+			return true;
 		}
 		catch(IOException ioEx) {
 			logger.error("Problema no método trataDiretorioDosFrames: ", ioEx);
+			ioEx.printStackTrace();
+			return false;
+		}
+	}
+	
+	private void apagaDiretorioDosFramesCriados(String diretorioDosFramesDoVideo) {
+		try {
+			File diretorioDoVideo = new File(diretorioDosFramesDoVideo);
+			if(diretorioDoVideo.exists()) { 
+				FileUtils.forceDelete(diretorioDoVideo);
+			}
+		}
+		catch(IOException ioEx) {
+			logger.error("Problema no método apagaDiretorioDosFramesCriados: ", ioEx);
 			ioEx.printStackTrace();
 		}
 	}
@@ -161,11 +182,17 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
         }
     }
 	
-    private String toVideoMessage(VideoDto video){
-        Map message = new HashMap<String, String>();
+    private String toVideoMessage(VideoDto video, boolean sucesso){
+        HashMap<Object, Object> message = new HashMap<>();
+        message.put("id",video.getId());
         message.put("nomeVideo",video.getNome());
-        message.put("codigoEdicao",video.getCodigoEdicao().toString());
-        message.put("statusEdicao",StatusEdicao.FINALIZADA);
+        message.put("codigoEdicao",video.getCodigoEdicao());
+        if(sucesso) {
+        	message.put("statusEdicao",StatusEdicao.EXTRAIDA);
+        }
+        else {
+        	message.put("statusEdicao",StatusEdicao.COM_ERRO);
+        }
         return gson.toJson(message);
     }
 	

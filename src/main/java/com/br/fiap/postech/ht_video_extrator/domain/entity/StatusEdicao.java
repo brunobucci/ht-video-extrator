@@ -1,5 +1,5 @@
 package com.br.fiap.postech.ht_video_extrator.domain.entity;
 
 public enum StatusEdicao {
-	CRIADA, PENDENTE, FINALIZADA
+	CRIADA, EXTRAIDA, COMPACTADA, FINALIZADA, COM_ERRO
 }
