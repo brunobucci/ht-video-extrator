@@ -15,6 +15,9 @@ FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
+# Instala ffmpeg e ffprobe
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+
 # Copia o JAR gerado da etapa de build
 COPY --from=build /app/target/ht-video-extrator-*.jar app.jar
 
