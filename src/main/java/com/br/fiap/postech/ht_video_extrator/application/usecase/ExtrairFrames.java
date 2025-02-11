@@ -37,17 +37,17 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
     @Autowired
     private Gson gson;
     
-    @Value("${caminhoDaPastaDeVideos}")
-    private String caminhoDaPastaDeVideos;
+    @Value("${caminhoDaPastaDeVideos}") 
+    String caminhoDaPastaDeVideos;
     
-    @Value("${caminhoDaPastaDeFrames}")
-    private String caminhoDaPastaDeFrames;
+    @Value("${caminhoDaPastaDeFrames}") 
+    String caminhoDaPastaDeFrames;
     
     @Value("${caminhoDoFfprobe}")
-    private String caminhoDoFfprobe;
+    String caminhoDoFfprobe;
     
     @Value("${caminhoDoFfmpeg}")
-    private String caminhoDoFfmpeg;
+    String caminhoDoFfmpeg;
     
     public ExtrairFrames(IExtracaoQueueAdapterOUT extracaoQueueAdapterOUT) {
         this.extracaoQueueAdapterOUT = extracaoQueueAdapterOUT;
@@ -80,7 +80,7 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
 		}
 	}
 
-	private boolean executaExtracaoDeFrames(VideoDto videoDto) {
+	boolean executaExtracaoDeFrames(VideoDto videoDto) {
 
 		try {
 			String video = videoDto.getNome();
@@ -137,7 +137,7 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
 		
 	}
 
-	private boolean trataDiretorioDosFrames(String diretorioDosFramesDoVideo) {
+	boolean trataDiretorioDosFrames(String diretorioDosFramesDoVideo) {
 		
 		try {
 			File diretorioDoVideo = new File(diretorioDosFramesDoVideo);
@@ -154,7 +154,7 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
 		}
 	}
 	
-	private void apagaDiretorioDosFramesCriados(String diretorioDosFramesDoVideo) {
+	void apagaDiretorioDosFramesCriados(String diretorioDosFramesDoVideo) {
 		try {
 			File diretorioDoVideo = new File(diretorioDosFramesDoVideo);
 			if(diretorioDoVideo.exists()) { 
@@ -167,7 +167,7 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
 		}
 	}
 
-	private String converteSegundosParaMomentoDoFrame(int segundos) {
+	String converteSegundosParaMomentoDoFrame(int segundos) {
 		String retorno = LocalTime.MIN.plusSeconds(segundos).toString();
 		return retorno.length() == 5 ? retorno + ":00" : retorno; 
 	}
@@ -182,11 +182,12 @@ public class ExtrairFrames implements IExtrairFramesUseCase {
         }
     }
 	
-    private String toVideoMessage(VideoDto video, boolean sucesso){
+    String toVideoMessage(VideoDto video, boolean sucesso){
         HashMap<Object, Object> message = new HashMap<>();
         message.put("id",video.getId());
         message.put("nomeVideo",video.getNome());
         message.put("codigoEdicao",video.getCodigoEdicao());
+        message.put("tentativasDeEdicao",video.getTentativasDeEdicao());
         if(sucesso) {
         	message.put("statusEdicao",StatusEdicao.EXTRAIDA);
         }
