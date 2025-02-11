@@ -6,8 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class HtVideoExtratorApplicationTests {
 
-	//@Test
-	void contextLoads() {
+	@Test
+	void main() {
+		HtVideoExtratorApplication.main(new String[] {});
 	}
 
 }

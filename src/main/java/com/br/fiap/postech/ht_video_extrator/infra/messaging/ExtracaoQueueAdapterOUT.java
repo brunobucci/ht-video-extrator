@@ -14,17 +14,17 @@ public class ExtracaoQueueAdapterOUT implements IExtracaoQueueAdapterOUT{
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	@Value("${queue2.name}")
-	private String filaVideosExtraidos;
+	@Value("${queue2.name}") 
+	String filaVideosExtraidos;
 	
-	@Value("${queue3.name}")
-	private String filaVideosProcessados;
+	@Value("${queue3.name}") 
+	String filaVideosProcessados;
 	
 	@Value("${queue4.name}")
-	private String filaVideosComNotificacao;
+	String filaVideosComNotificacao;
 	
 	@Autowired
-	private RabbitTemplate rabbitTemplate;
+	RabbitTemplate rabbitTemplate;
 	
 	@Override
 	public void publishVideoProcessado(String videoJson) {

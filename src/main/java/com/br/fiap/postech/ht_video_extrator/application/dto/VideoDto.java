@@ -11,5 +11,6 @@ public class VideoDto {
 	private String id;
     private String codigoEdicao;
 	private String nome;
+	private String tentativasDeEdicao;
     private StatusEdicao statusEdicao;
 }
